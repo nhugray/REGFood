@@ -1,3 +1,100 @@
 <resources>
     <string name="app_name">REGFood</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_foods">Foods</string>
+    <string name="nav_journal">Journal</string>
+    <string name="nav_goals">Goals</string>
+    <string name="nav_account">Account</string>
+
+    <string name="home_greeting">Hello, Guest</string>
+    <string name="user_display_guest">Guest</string>
+    <string name="home_subtitle">Track smarter meals with AI-powered recognition.</string>
+    <string name="guest_badge">Guest Mode</string>
+    <string name="home_hero_title">Scan Your Meal</string>
+    <string name="home_hero_subtitle">Take a photo and get instant calorie and nutrition estimates.</string>
+    <string name="action_scan_now">Scan now</string>
+    <string name="action_log_manual">Manual log</string>
+    <string name="section_daily_overview">Daily Overview</string>
+    <string name="stat_kcal">Calories left</string>
+    <string name="stat_kcal_value">1,150 kcal</string>
+    <string name="stat_protein">Protein target</string>
+    <string name="stat_protein_value">62 g</string>
+    <string name="stat_goal_progress">Today completion</string>
+    <string name="stat_goal_progress_value">68% complete</string>
+    <string name="scan_hint">Meal recognition will be connected to AI pipeline next.</string>
+    <string name="manual_log_hint">Manual logging flow will be available soon.</string>
+    <string name="scan_mode_title">Recognition Mode</string>
+    <string name="scan_mode_subtitle">Choose how you want to add a food image.</string>
+    <string name="action_back_home">Home</string>
+    <string name="history_title">Manual Log History</string>
+    <string name="history_subtitle">Your recently logged meals are listed here.</string>
+    <string name="history_recent_title">Recent entries</string>
+    <string name="history_item_1_title">Banh Mi Thit • 410 kcal</string>
+    <string name="history_item_1_desc">Today, 08:15 • Manual log</string>
+    <string name="history_item_2_title">Mi Quang • 520 kcal</string>
+    <string name="history_item_2_desc">Yesterday, 12:40 • Manual log</string>
+    <string name="history_item_3_title">Bun Cha Ca • 430 kcal</string>
+    <string name="history_item_3_desc">Yesterday, 18:05 • Manual log</string>
+    <string name="action_back_from_history">Back to home overview</string>
+    <string name="scan_frame_title">Center the meal inside the frame</string>
+    <string name="scan_frame_subtitle">A QR-style capture experience for quick meal recognition.</string>
+    <string name="scan_action_camera">Capture photo</string>
+    <string name="scan_action_gallery">Upload image</string>
+    <string name="result_title">Recognition Result</string>
+    <string name="result_subtitle">Sample result view after image analysis.</string>
+    <string name="result_food_name">Banh Mi Thit</string>
+    <string name="result_confidence">High confidence • 94%%</string>
+    <string name="result_short_desc">Crispy bread, pork, herbs, and vegetables.</string>
+    <string name="result_kcal_label">Calories</string>
+    <string name="result_kcal_value">410 kcal</string>
+    <string name="result_macro_label">Macro estimate</string>
+    <string name="result_macro_value">P 18g • C 42g</string>
+    <string name="result_scan_again">Scan another</string>
+    <string name="result_add_to_favorites">Add to favorites</string>
+
+    <string name="foods_title">Food Library</string>
+    <string name="foods_subtitle">Browse supported dishes for guest meal recognition.</string>
+    <string name="foods_search_hint">Search supported foods...</string>
+    <string name="foods_section_supported">Supported Dishes</string>
+    <string name="foods_item_1">Banh Mi</string>
+    <string name="foods_item_1_short">Banh Mi</string>
+    <string name="foods_item_1_desc">Vietnamese bread sandwich with crisp bite.</string>
+    <string name="foods_item_1_detail_subtitle">Light, fast, and widely recognized.</string>
+    <string name="foods_item_1_detail_desc">Classic street food with pork, pate, herbs, pickles, and fresh vegetables.</string>
+    <string name="foods_item_1_detail_kcal">410 kcal</string>
+    <string name="foods_item_1_detail_energy">Good for quick breakfast</string>
+    <string name="foods_item_1_tag1">Street food</string>
+    <string name="foods_item_1_tag2">Breakfast</string>
+
+    <string name="foods_item_2">Mi Quang</string>
+    <string name="foods_item_2_short">Mi Quang</string>
+    <string name="foods_item_2_desc">Central Vietnam noodles with rich toppings.</string>
+    <string name="foods_item_2_detail_subtitle">Warm, hearty, and nutrient dense.</string>
+    <string name="foods_item_2_detail_desc">Turmeric noodles, shrimp, pork, peanuts, herbs, and a light broth base.</string>
+    <string name="foods_item_2_detail_kcal">520 kcal</string>
+    <string name="foods_item_2_detail_energy">Balanced main meal</string>
+    <string name="foods_item_2_tag1">Noodles</string>
+    <string name="foods_item_2_tag2">Protein rich</string>
+
+    <string name="foods_item_3">Bun Cha Ca</string>
+    <string name="foods_item_3_short">Bun Cha Ca</string>
+    <string name="foods_item_3_desc">Fish cake noodle soup from coastal Vietnam.</string>
+    <string name="foods_item_3_detail_subtitle">Fresh taste with a lighter profile.</string>
+    <string name="foods_item_3_detail_desc">Rice noodles, fish cakes, herbs, tomatoes, and a clear savory broth.</string>
+    <string name="foods_item_3_detail_kcal">430 kcal</string>
+    <string name="foods_item_3_detail_energy">Seafood comfort dish</string>
+    <string name="foods_item_3_tag1">Seafood</string>
+    <string name="foods_item_3_tag2">Lunch</string>
+
+    <string name="food_detail_kcal">Estimated calories</string>
+    <string name="food_detail_energy">Meal type</string>
+    <string name="action_back_foods">Foods</string>
+    <string name="action_try_recognize_again">Add to favorites</string>
+    <string name="favorite_added_hint">Added to favorites list.</string>
+
+    <string name="coming_soon_generic">This feature is being polished for the next release.</string>
+    <string name="coming_soon_journal">Track your daily meal timeline here soon.</string>
+    <string name="coming_soon_goals">Set calorie and macro goals with weekly insights soon.</string>
+    <string name="coming_soon_account">Profile and personalization settings are coming soon.</string>
 </resources>

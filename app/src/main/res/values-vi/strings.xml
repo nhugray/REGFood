@@ -1,0 +1,100 @@
+<resources>
+    <string name="app_name">REGFood</string>
+
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_foods">Món ăn</string>
+    <string name="nav_journal">Nhật ký</string>
+    <string name="nav_goals">Mục tiêu</string>
+    <string name="nav_account">Tài khoản</string>
+
+    <string name="home_greeting">Chào bạn, Khách</string>
+    <string name="user_display_guest">Khách</string>
+    <string name="home_subtitle">Theo dõi bữa ăn thông minh bằng nhận diện AI.</string>
+    <string name="guest_badge">Chế độ khách</string>
+    <string name="home_hero_title">Quét Món Ăn</string>
+    <string name="home_hero_subtitle">Chụp ảnh để nhận ngay ước tính calo và dinh dưỡng.</string>
+    <string name="action_scan_now">Quét ngay</string>
+    <string name="action_log_manual">Ghi tay</string>
+    <string name="section_daily_overview">Tổng quan hôm nay</string>
+    <string name="stat_kcal">Calo còn lại</string>
+    <string name="stat_kcal_value">1.150 kcal</string>
+    <string name="stat_protein">Mục tiêu đạm</string>
+    <string name="stat_protein_value">62 g</string>
+    <string name="stat_goal_progress">Tiến độ hôm nay</string>
+    <string name="stat_goal_progress_value">Hoàn thành 68%</string>
+    <string name="scan_hint">Luồng nhận diện món sẽ kết nối AI ở bước tiếp theo.</string>
+    <string name="manual_log_hint">Luồng ghi tay sẽ sớm được bổ sung.</string>
+    <string name="scan_mode_title">Chế độ nhận diện</string>
+    <string name="scan_mode_subtitle">Chọn cách thêm ảnh món ăn vào hệ thống.</string>
+    <string name="action_back_home">Trang chủ</string>
+    <string name="history_title">Lịch sử ghi tay</string>
+    <string name="history_subtitle">Các bữa ăn bạn đã ghi tay gần đây.</string>
+    <string name="history_recent_title">Nhật ký gần nhất</string>
+    <string name="history_item_1_title">Bánh mì thịt • 410 kcal</string>
+    <string name="history_item_1_desc">Hôm nay, 08:15 • Ghi tay</string>
+    <string name="history_item_2_title">Mì Quảng • 520 kcal</string>
+    <string name="history_item_2_desc">Hôm qua, 12:40 • Ghi tay</string>
+    <string name="history_item_3_title">Bún chả cá • 430 kcal</string>
+    <string name="history_item_3_desc">Hôm qua, 18:05 • Ghi tay</string>
+    <string name="action_back_from_history">Quay lại tổng quan</string>
+    <string name="scan_frame_title">Đặt món ăn vào giữa khung</string>
+    <string name="scan_frame_subtitle">Trải nghiệm chụp kiểu QR/locket gọn nhanh cho nhận diện món.</string>
+    <string name="scan_action_camera">Chụp ảnh</string>
+    <string name="scan_action_gallery">Tải ảnh lên</string>
+    <string name="result_title">Kết quả nhận diện</string>
+    <string name="result_subtitle">Màn hình kết quả mẫu sau khi phân tích ảnh.</string>
+    <string name="result_food_name">Bánh mì thịt</string>
+    <string name="result_confidence">Độ tin cậy cao • 94%%</string>
+    <string name="result_short_desc">Bánh mì giòn, thịt, rau thơm và đồ chua.</string>
+    <string name="result_kcal_label">Calo</string>
+    <string name="result_kcal_value">410 kcal</string>
+    <string name="result_macro_label">Ước tính macro</string>
+    <string name="result_macro_value">P 18g • C 42g</string>
+    <string name="result_scan_again">Quét món khác</string>
+    <string name="result_add_to_favorites">Thêm vào mục yêu thích</string>
+
+    <string name="foods_title">Thư viện món ăn</string>
+    <string name="foods_subtitle">Xem danh sách món được hỗ trợ cho chế độ khách.</string>
+    <string name="foods_search_hint">Tìm kiếm món được hỗ trợ...</string>
+    <string name="foods_section_supported">Các món được hỗ trợ</string>
+    <string name="foods_item_1">Bánh mì</string>
+    <string name="foods_item_1_short">Bánh mì</string>
+    <string name="foods_item_1_desc">Món sandwich Việt Nam với lớp vỏ giòn.</string>
+    <string name="foods_item_1_detail_subtitle">Nhẹ, nhanh và dễ nhận diện.</string>
+    <string name="foods_item_1_detail_desc">Món ăn đường phố quen thuộc với thịt, pate, rau thơm, đồ chua và rau tươi.</string>
+    <string name="foods_item_1_detail_kcal">410 kcal</string>
+    <string name="foods_item_1_detail_energy">Phù hợp bữa sáng nhanh</string>
+    <string name="foods_item_1_tag1">Đường phố</string>
+    <string name="foods_item_1_tag2">Bữa sáng</string>
+
+    <string name="foods_item_2">Mì Quảng</string>
+    <string name="foods_item_2_short">Mì Quảng</string>
+    <string name="foods_item_2_desc">Mì miền Trung với topping đậm đà.</string>
+    <string name="foods_item_2_detail_subtitle">Ấm, no và giàu dinh dưỡng.</string>
+    <string name="foods_item_2_detail_desc">Sợi mì vàng, tôm, thịt, đậu phộng, rau thơm và lượng nước dùng vừa phải.</string>
+    <string name="foods_item_2_detail_kcal">520 kcal</string>
+    <string name="foods_item_2_detail_energy">Bữa chính cân bằng</string>
+    <string name="foods_item_2_tag1">Mì</string>
+    <string name="foods_item_2_tag2">Giàu đạm</string>
+
+    <string name="foods_item_3">Bún chả cá</string>
+    <string name="foods_item_3_short">Bún chả cá</string>
+    <string name="foods_item_3_desc">Món bún cá từ vùng biển Việt Nam.</string>
+    <string name="foods_item_3_detail_subtitle">Hương vị tươi và nhẹ nhàng hơn.</string>
+    <string name="foods_item_3_detail_desc">Bún, chả cá, rau thơm, cà chua và nước dùng trong đậm vị.</string>
+    <string name="foods_item_3_detail_kcal">430 kcal</string>
+    <string name="foods_item_3_detail_energy">Món cá dễ ăn</string>
+    <string name="foods_item_3_tag1">Hải sản</string>
+    <string name="foods_item_3_tag2">Bữa trưa</string>
+
+    <string name="food_detail_kcal">Calo ước tính</string>
+    <string name="food_detail_energy">Loại bữa ăn</string>
+    <string name="action_back_foods">Món ăn</string>
+    <string name="action_try_recognize_again">Thêm vào mục yêu thích</string>
+    <string name="favorite_added_hint">Đã thêm vào danh sách yêu thích.</string>
+
+    <string name="coming_soon_generic">Tính năng này đang được hoàn thiện cho bản phát hành tiếp theo.</string>
+    <string name="coming_soon_journal">Nhật ký bữa ăn hằng ngày sẽ sớm có tại đây.</string>
+    <string name="coming_soon_goals">Thiết lập mục tiêu calo và macro theo tuần sẽ sớm ra mắt.</string>
+    <string name="coming_soon_account">Hồ sơ và tùy chỉnh cá nhân sẽ sớm có mặt.</string>
+</resources>
