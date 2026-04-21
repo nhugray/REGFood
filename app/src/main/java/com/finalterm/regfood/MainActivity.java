@@ -14,16 +14,19 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.finalterm.regfood.app.navigation.BottomTab;
 import com.finalterm.regfood.features.foods.view.ui.FoodsFragment;
+import com.finalterm.regfood.features.goals.view.ui.GoalsFragment;
 import com.finalterm.regfood.features.home.view.ui.HomeFragment;
-import com.finalterm.regfood.shared.view.ui.ComingSoonFragment;
+import com.finalterm.regfood.features.insights.view.ui.InsightsFragment;
+import com.finalterm.regfood.features.journal.view.ui.JournalFragment;
+import com.finalterm.regfood.shared.session.UserSession;
 
 public class MainActivity extends AppCompatActivity {
 
-        private static final String TAG_HOME = "tag_home";
-        private static final String TAG_FOODS = "tag_foods";
-        private static final String TAG_JOURNAL = "tag_journal";
-        private static final String TAG_GOALS = "tag_goals";
-        private static final String TAG_ACCOUNT = "tag_account";
+    private static final String TAG_HOME = "tag_home";
+    private static final String TAG_FOODS = "tag_foods";
+    private static final String TAG_JOURNAL = "tag_journal";
+    private static final String TAG_GOALS = "tag_goals";
+    private static final String TAG_INSIGHTS = "tag_insights";
 
     private BottomTab currentTab = BottomTab.HOME;
 
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.navFoods).setOnClickListener(v -> selectTab(BottomTab.FOODS, false));
         findViewById(R.id.navJournal).setOnClickListener(v -> selectTab(BottomTab.JOURNAL, false));
         findViewById(R.id.navGoals).setOnClickListener(v -> selectTab(BottomTab.GOALS, false));
-        findViewById(R.id.navAccount).setOnClickListener(v -> selectTab(BottomTab.ACCOUNT, false));
+        findViewById(R.id.navInsights).setOnClickListener(v -> selectTab(BottomTab.INSIGHTS, false));
     }
 
     private void selectTab(BottomTab selectedTab, boolean forceRefresh) {
@@ -74,41 +77,25 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case JOURNAL:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(
-                                R.id.contentHost,
-                                ComingSoonFragment.newInstance(
-                                        getString(R.string.nav_journal),
-                                        getString(R.string.coming_soon_journal)
-                                ),
-                                TAG_JOURNAL
-                        )
+                        .replace(R.id.contentHost, new JournalFragment(), TAG_JOURNAL)
                         .commit();
                 break;
             case GOALS:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(
-                                R.id.contentHost,
-                                ComingSoonFragment.newInstance(
-                                        getString(R.string.nav_goals),
-                                        getString(R.string.coming_soon_goals)
-                                ),
-                                TAG_GOALS
-                        )
+                        .replace(R.id.contentHost, new GoalsFragment(), TAG_GOALS)
                         .commit();
                 break;
-            case ACCOUNT:
+            case INSIGHTS:
                 getSupportFragmentManager().beginTransaction()
-                        .replace(
-                                R.id.contentHost,
-                                ComingSoonFragment.newInstance(
-                                        getString(R.string.nav_account),
-                                        getString(R.string.coming_soon_account)
-                                ),
-                                TAG_ACCOUNT
-                        )
+                        .replace(R.id.contentHost, new InsightsFragment(), TAG_INSIGHTS)
                         .commit();
                 break;
         }
+    }
+
+    public void openHomeLoginState() {
+        UserSession.requestLoginPrompt();
+        selectTab(BottomTab.HOME, true);
     }
 
     private void resetCurrentTabView(BottomTab selectedTab) {

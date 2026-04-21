@@ -169,7 +169,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/navAccount"
+            android:id="@+id/navInsights"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -186,8 +186,8 @@
                 android:id="@+id/navIcon"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:contentDescription="@string/nav_account"
-                android:src="@android:drawable/ic_menu_myplaces"
+                android:contentDescription="@string/nav_insights"
+                android:src="@android:drawable/ic_menu_week"
                 android:tint="@color/neutral_500" />
 
             <TextView
@@ -195,7 +195,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@string/nav_account"
+                android:text="@string/nav_insights"
                 android:textColor="@color/neutral_500"
                 android:textSize="11sp"
                 android:textStyle="bold" />

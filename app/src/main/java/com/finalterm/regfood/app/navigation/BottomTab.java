@@ -7,7 +7,7 @@ public enum BottomTab {
     FOODS(R.id.navFoods),
     JOURNAL(R.id.navJournal),
     GOALS(R.id.navGoals),
-    ACCOUNT(R.id.navAccount);
+    INSIGHTS(R.id.navInsights);
 
     public final int itemId;
 

@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.finalterm.regfood.R;
+import com.finalterm.regfood.shared.session.UserSession;
 
 public class FoodsFragment extends Fragment {
 
@@ -26,6 +27,7 @@ public class FoodsFragment extends Fragment {
     private TextView foodDetailEnergy;
     private TextView foodTag1;
     private TextView foodTag2;
+    private TextView foodsDetailUserInitial;
 
     @Nullable
     @Override
@@ -48,6 +50,7 @@ public class FoodsFragment extends Fragment {
         foodDetailEnergy = view.findViewById(R.id.tvFoodDetailEnergy);
         foodTag1 = view.findViewById(R.id.tvFoodTag1);
         foodTag2 = view.findViewById(R.id.tvFoodTag2);
+        foodsDetailUserInitial = view.findViewById(R.id.tvFoodsDetailUserInitial);
 
         view.findViewById(R.id.cardBanhMi).setOnClickListener(v -> showFoodDetail(FoodEntry.BANH_MI));
         view.findViewById(R.id.cardMiQuang).setOnClickListener(v -> showFoodDetail(FoodEntry.MI_QUANG));
@@ -82,6 +85,14 @@ public class FoodsFragment extends Fragment {
         foodDetailEnergy.setText(entry.energy);
         foodTag1.setText(entry.tag1);
         foodTag2.setText(entry.tag2);
+        foodsDetailUserInitial.setText(UserSession.isGuest() ? "G" : getEmailInitial(UserSession.getCurrentEmail()));
+    }
+
+    private String getEmailInitial(String email) {
+        if (email == null || email.isEmpty()) {
+            return "U";
+        }
+        return String.valueOf(Character.toUpperCase(email.charAt(0)));
     }
 
     private enum FoodEntry {

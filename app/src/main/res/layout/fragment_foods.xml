@@ -299,19 +299,21 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvFoodsDetailUser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_soft_orange_badge"
-                    android:paddingStart="10dp"
-                    android:paddingTop="6dp"
-                    android:paddingEnd="10dp"
-                    android:paddingBottom="6dp"
-                    android:text="@string/user_display_guest"
-                    android:textColor="@color/orange_500"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
+                <FrameLayout
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_avatar_circle">
+
+                    <TextView
+                        android:id="@+id/tvFoodsDetailUserInitial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="G"
+                        android:textColor="@color/orange_500"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
