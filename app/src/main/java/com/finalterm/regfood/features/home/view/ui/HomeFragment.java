@@ -11,9 +11,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
 
 import com.finalterm.regfood.R;
 import com.finalterm.regfood.shared.session.UserSession;
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 
 public class HomeFragment extends Fragment {
 
@@ -35,6 +41,7 @@ public class HomeFragment extends Fragment {
     private View historyMemberRoot;
     private EditText etLoginEmail;
     private EditText etLoginPassword;
+    private View btnGoogleSignIn;
 
     @Nullable
     @Override
@@ -65,6 +72,7 @@ public class HomeFragment extends Fragment {
         historyMemberRoot = view.findViewById(R.id.historyMemberRoot);
         etLoginEmail = view.findViewById(R.id.etLoginEmail);
         etLoginPassword = view.findViewById(R.id.etLoginPassword);
+        btnGoogleSignIn = view.findViewById(R.id.btnGoogleSignIn);
 
         view.findViewById(R.id.btnScanMeal).setOnClickListener(v -> showScanState());
         view.findViewById(R.id.btnManualLog).setOnClickListener(v -> showHistoryState());
@@ -91,6 +99,7 @@ public class HomeFragment extends Fragment {
             Toast.makeText(requireContext(), R.string.favorite_added_hint, Toast.LENGTH_SHORT).show()
         );
         view.findViewById(R.id.btnScanAnother).setOnClickListener(v -> showScanState());
+        btnGoogleSignIn.setOnClickListener(v -> handleGoogleSignIn());
 
         refreshUserUi();
         if (UserSession.consumeLoginPrompt()) {
@@ -174,15 +183,68 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        if (UserSession.login(email, password)) {
-            Toast.makeText(requireContext(), R.string.auth_login_success, Toast.LENGTH_SHORT).show();
-            etLoginEmail.setText("");
-            etLoginPassword.setText("");
-            showHomeState();
-            return;
-        }
+        // Use Firebase Auth
+        com.google.firebase.auth.FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(requireContext(), R.string.auth_login_success, Toast.LENGTH_SHORT).show();
+                        etLoginEmail.setText("");
+                        etLoginPassword.setText("");
+                        showHomeState();
+                    } else {
+                        Toast.makeText(requireContext(), "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
-        Toast.makeText(requireContext(), R.string.auth_invalid_credentials, Toast.LENGTH_SHORT).show();
+    private void handleGoogleSignIn() {
+        CredentialManager credentialManager = CredentialManager.create(requireContext());
+
+        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId("648230409552-72h6u0jaa5jo64jehj86s4r1e9vsbi75.apps.googleusercontent.com")
+                .build();
+
+        GetCredentialRequest request = new GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build();
+
+        credentialManager.getCredentialAsync(
+                requireActivity(),
+                request,
+                null,
+                requireActivity().getMainExecutor(),
+                new androidx.credentials.CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse result) {
+                        handleSignIn(result);
+                    }
+
+                    @Override
+                    public void onError(GetCredentialException e) {
+                        Toast.makeText(requireContext(), "Google Sign-In failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+    }
+
+    private void handleSignIn(GetCredentialResponse result) {
+        if (result.getCredential() instanceof GoogleIdTokenCredential) {
+            GoogleIdTokenCredential googleIdTokenCredential = (GoogleIdTokenCredential) result.getCredential();
+            String idToken = googleIdTokenCredential.getIdToken();
+
+            // Now use Firebase Auth to sign in with the token
+            com.google.firebase.auth.FirebaseAuth.getInstance().signInWithCredential(
+                    com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
+            ).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(requireContext(), R.string.auth_login_success, Toast.LENGTH_SHORT).show();
+                    showHomeState();
+                } else {
+                    Toast.makeText(requireContext(), "Firebase sign-in failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void refreshUserUi() {

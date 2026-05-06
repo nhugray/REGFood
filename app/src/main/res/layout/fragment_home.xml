@@ -740,6 +740,17 @@
                         android:textAllCaps="false" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGoogleSignIn"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Sign in with Google"
+                        android:textAllCaps="false"
+                        app:icon="@drawable/ic_google_logo"
+                        app:iconGravity="textStart" />
+
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnBackToAccount"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="match_parent"
