@@ -11,7 +11,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.credentials.Credential;
 import androidx.credentials.CredentialManager;
+import androidx.credentials.CustomCredential;
 import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
@@ -20,6 +22,8 @@ import com.finalterm.regfood.R;
 import com.finalterm.regfood.shared.session.UserSession;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 public class HomeFragment extends Fragment {
 
@@ -183,8 +187,7 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        // Use Firebase Auth
-        com.google.firebase.auth.FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(requireContext(), R.string.auth_login_success, Toast.LENGTH_SHORT).show();
@@ -192,7 +195,8 @@ public class HomeFragment extends Fragment {
                         etLoginPassword.setText("");
                         showHomeState();
                     } else {
-                        Toast.makeText(requireContext(), "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        String message = task.getException() != null ? task.getException().getMessage() : getString(R.string.auth_invalid_credentials);
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -202,7 +206,7 @@ public class HomeFragment extends Fragment {
 
         GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
-                .setServerClientId("648230409552-72h6u0jaa5jo64jehj86s4r1e9vsbi75.apps.googleusercontent.com")
+                .setServerClientId(getString(R.string.default_web_client_id))
                 .build();
 
         GetCredentialRequest request = new GetCredentialRequest.Builder()
@@ -229,22 +233,32 @@ public class HomeFragment extends Fragment {
     }
 
     private void handleSignIn(GetCredentialResponse result) {
-        if (result.getCredential() instanceof GoogleIdTokenCredential) {
-            GoogleIdTokenCredential googleIdTokenCredential = (GoogleIdTokenCredential) result.getCredential();
-            String idToken = googleIdTokenCredential.getIdToken();
+        Credential credential = result.getCredential();
 
-            // Now use Firebase Auth to sign in with the token
-            com.google.firebase.auth.FirebaseAuth.getInstance().signInWithCredential(
-                    com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
-            ).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(requireContext(), R.string.auth_login_success, Toast.LENGTH_SHORT).show();
-                    showHomeState();
-                } else {
-                    Toast.makeText(requireContext(), "Firebase sign-in failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+        if (credential instanceof CustomCredential) {
+            CustomCredential customCredential = (CustomCredential) credential;
+            if (GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(customCredential.getType())) {
+                GoogleIdTokenCredential googleIdTokenCredential = GoogleIdTokenCredential.createFrom(customCredential.getData());
+                String idToken = googleIdTokenCredential.getIdToken();
+
+                FirebaseAuth.getInstance()
+                        .signInWithCredential(GoogleAuthProvider.getCredential(idToken, null))
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(requireContext(), R.string.auth_login_success, Toast.LENGTH_SHORT).show();
+                                etLoginEmail.setText("");
+                                etLoginPassword.setText("");
+                                showHomeState();
+                            } else {
+                                String message = task.getException() != null ? task.getException().getMessage() : "Firebase sign-in failed.";
+                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                return;
+            }
         }
+
+        Toast.makeText(requireContext(), "No Google credential returned.", Toast.LENGTH_SHORT).show();
     }
 
     private void refreshUserUi() {

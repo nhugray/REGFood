@@ -19,7 +19,7 @@ public final class RoomDatabaseProvider {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "regfood_local_db"
-                    ).fallbackToDestructiveMigration().build();
+                    ).build();
                 }
             }
         }
