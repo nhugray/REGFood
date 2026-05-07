@@ -1,6 +1,7 @@
 package com.finalterm.regfood.local.entity;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "user_profiles")
@@ -44,5 +45,9 @@ public class UserProfileEntity {
         this.targetFat = targetFat;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    @Ignore
+    public UserProfileEntity() {
     }
 }

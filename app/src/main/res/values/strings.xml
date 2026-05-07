@@ -75,6 +75,7 @@
     <string name="auth_login_success">Login successful.</string>
     <string name="auth_logout_success">Logged out. Switched to Guest mode.</string>
     <string name="action_logout">Logout</string>
+    <string name="default_web_client_id">648230409552-euqeonfcubsuufjkejg2kdnp98s6d2bh.apps.googleusercontent.com</string>
     <string name="gate_login_required">Login to use this feature</string>
     <string name="history_guest_preview_title">Manual Log Preview</string>
     <string name="history_guest_preview_item_title">Daily timeline with meal notes</string>
