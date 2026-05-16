@@ -43,10 +43,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class FoodRecognitionFragment extends Fragment {
+public class FoodRecognitionFragment extends Fragment implements ConfirmFoodBottomSheet.FoodConfirmationListener {
     private static final String TAG = "FoodRecognition";
     private static final int PERMISSION_REQUEST_CODE = 100;
-    private static final String IMAGE_DIR = "images";
+    private static final String IMAGE_DIR = "food_images";
 
     private LinearLayout cameraStateRoot;
     private LinearLayout loadingStateRoot;
@@ -70,6 +70,7 @@ public class FoodRecognitionFragment extends Fragment {
 
     private File currentCapturedImageFile;
     private Uri currentImageUri;
+    private FoodPredictionResponse currentPredictionResponse;
 
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private ActivityResultLauncher<Uri> takePictureLauncher;
@@ -193,6 +194,7 @@ public class FoodRecognitionFragment extends Fragment {
     private void observeViewModel() {
         viewModel.getPredictionResult().observe(getViewLifecycleOwner(), result -> {
             if (result != null) {
+                currentPredictionResponse = result;
                 displayResult(result);
                 showResultState();
             }
@@ -254,7 +256,9 @@ public class FoodRecognitionFragment extends Fragment {
             }
 
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-            return new File(imageDir, "food_" + timestamp + ".jpg");
+            File imageFile = new File(imageDir, "food_" + timestamp + ".jpg");
+            Log.d(TAG, "Created image file: " + imageFile.getAbsolutePath());
+            return imageFile;
         } catch (Exception e) {
             Log.e(TAG, "Error creating image file", e);
             return null;
@@ -448,10 +452,22 @@ public class FoodRecognitionFragment extends Fragment {
     }
 
     private void confirmFoodSelection() {
-        FoodPredictionResponse result = viewModel.getPredictionResult().getValue();
-        if (result != null && result.data != null) {
-            Toast.makeText(requireContext(), "Đã chọn: " + result.data.name, Toast.LENGTH_SHORT).show();
+        FoodPredictionResponse result = currentPredictionResponse != null
+                ? currentPredictionResponse
+                : viewModel.getPredictionResult().getValue();
+
+        if (result == null || result.data == null) {
+            Toast.makeText(requireContext(), "Chưa có kết quả để xác nhận", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        if (currentCapturedImageFile == null || !currentCapturedImageFile.exists()) {
+            Toast.makeText(requireContext(), "Ảnh tạm đã mất, vui lòng quét lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ConfirmFoodBottomSheet.newInstance(result, currentCapturedImageFile.getAbsolutePath())
+                .show(getChildFragmentManager(), "confirm_food_bottom_sheet");
     }
 
     private void retryRecognition() {
@@ -488,6 +504,15 @@ public class FoodRecognitionFragment extends Fragment {
         loadingStateRoot.setVisibility(View.GONE);
         resultStateRoot.setVisibility(View.GONE);
         errorStateRoot.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onFoodConfirmed(String foodName, double portionMultiplier, String toppings, double finalCalories, FoodPredictionResponse response) {
+        Log.d(TAG, "Confirmed food=" + foodName + ", portion=" + portionMultiplier + ", toppings=" + toppings + ", calories=" + finalCalories);
+        cleanupPendingImageFile();
+        currentPredictionResponse = null;
+        Toast.makeText(requireContext(), "Đã xác nhận: " + foodName, Toast.LENGTH_SHORT).show();
+        showCameraState();
     }
 
     @Override
