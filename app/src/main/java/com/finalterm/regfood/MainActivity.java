@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.finalterm.regfood.app.navigation.BottomTab;
 import com.finalterm.regfood.features.foods.view.ui.FoodsFragment;
+import com.finalterm.regfood.features.foodrecognition.view.ui.MealHistoryFragment;
 import com.finalterm.regfood.features.goals.view.ui.GoalsFragment;
 import com.finalterm.regfood.features.home.view.ui.HomeFragment;
 import com.finalterm.regfood.features.insights.view.ui.InsightsFragment;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG_JOURNAL = "tag_journal";
     private static final String TAG_GOALS = "tag_goals";
     private static final String TAG_INSIGHTS = "tag_insights";
+    private static final String TAG_HISTORY = "tag_history";
 
     private BottomTab currentTab = BottomTab.HOME;
 
@@ -91,6 +93,14 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
                 break;
         }
+    }
+
+    public void openMealHistory() {
+        currentTab = BottomTab.JOURNAL;
+        updateBottomNavigationState(BottomTab.JOURNAL);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.contentHost, new MealHistoryFragment(), TAG_HISTORY)
+                .commit();
     }
 
     public void openHomeLoginState() {

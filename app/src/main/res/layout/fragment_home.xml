@@ -1184,4 +1184,11 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Fragment Container for Food Recognition -->
+    <FrameLayout
+        android:id="@+id/foodRecognitionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 </FrameLayout>

@@ -14,20 +14,29 @@ import androidx.fragment.app.Fragment;
 
 import com.finalterm.regfood.MainActivity;
 import com.finalterm.regfood.R;
+import com.finalterm.regfood.features.journal.data.JournalRepository;
+import com.finalterm.regfood.features.journal.domain.JournalSummary;
 import com.finalterm.regfood.shared.session.UserSession;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class JournalFragment extends Fragment {
 
     private View guestGateBar;
     private View guestPreviewRoot;
     private View memberInteractiveRoot;
-    private TextView tvCompletion;
-    private TextView tvWaterMl;
-    private CheckBox cbBreakfast;
-    private CheckBox cbLunch;
-    private CheckBox cbDinner;
-
-    private int currentWaterMl = 1500;
+    private TextView tvBreakfastValue;
+    private TextView tvLunchValue;
+    private TextView tvDinnerValue;
+    private TextView tvNightValue;
+    private MaterialButton btnOpenHistory;
+    private LinearProgressIndicator progressMeal;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private JournalRepository journalRepository;
 
     @Nullable
     @Override
@@ -40,30 +49,22 @@ public class JournalFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        journalRepository = new JournalRepository(requireContext().getApplicationContext());
         guestGateBar = view.findViewById(R.id.journalGuestGateBar);
         guestPreviewRoot = view.findViewById(R.id.journalGuestPreviewRoot);
         memberInteractiveRoot = view.findViewById(R.id.journalMemberInteractiveRoot);
-        tvCompletion = view.findViewById(R.id.tvJournalCompletion);
-        tvWaterMl = view.findViewById(R.id.tvJournalWaterMl);
-        cbBreakfast = view.findViewById(R.id.cbBreakfastDone);
-        cbLunch = view.findViewById(R.id.cbLunchDone);
-        cbDinner = view.findViewById(R.id.cbDinnerDone);
+        tvBreakfastValue = view.findViewById(R.id.tvBreakfastValue);
+        tvLunchValue = view.findViewById(R.id.tvLunchValue);
+        tvDinnerValue = view.findViewById(R.id.tvDinnerValue);
+        tvNightValue = view.findViewById(R.id.tvNightValue);
+        btnOpenHistory = view.findViewById(R.id.btnOpenMealHistory);
+        progressMeal = view.findViewById(R.id.progressMeal);
 
         view.findViewById(R.id.btnJournalLogin).setOnClickListener(v -> navigateToLogin());
-        view.findViewById(R.id.btnWaterPlus).setOnClickListener(v -> adjustWater(250));
-        view.findViewById(R.id.btnWaterMinus).setOnClickListener(v -> adjustWater(-250));
-        view.findViewById(R.id.btnJournalSave).setOnClickListener(v ->
-                Toast.makeText(requireContext(), R.string.journal_saved_success, Toast.LENGTH_SHORT).show()
-        );
+        btnOpenHistory.setOnClickListener(v -> openMealHistory());
 
-        View.OnClickListener updateListener = v -> updateCompletionStatus();
-        cbBreakfast.setOnClickListener(updateListener);
-        cbLunch.setOnClickListener(updateListener);
-        cbDinner.setOnClickListener(updateListener);
-
-        updateWaterUi();
-        updateCompletionStatus();
         renderAccessState();
+        loadTodaySummary();
     }
 
     private void renderAccessState() {
@@ -73,35 +74,47 @@ public class JournalFragment extends Fragment {
         memberInteractiveRoot.setVisibility(isGuest ? View.GONE : View.VISIBLE);
     }
 
-    private void adjustWater(int delta) {
-        currentWaterMl = Math.max(0, Math.min(4000, currentWaterMl + delta));
-        updateWaterUi();
+    private void loadTodaySummary() {
+        executor.execute(() -> {
+            JournalSummary summary = journalRepository.loadTodaySummary();
+            if (!isAdded()) {
+                return;
+            }
+            requireActivity().runOnUiThread(() -> applySummary(summary));
+        });
     }
 
-    private void updateWaterUi() {
-        if (tvWaterMl == null) {
-            return;
+    private void applySummary(JournalSummary summary) {
+        progressMeal.setProgress((int) Math.round(summary.mealCompletionRatio * 100));
+
+        tvBreakfastValue.setText(buildMealCopy("Bữa sáng", summary.breakfastCalories));
+        tvLunchValue.setText(buildMealCopy("Bữa trưa", summary.lunchCalories));
+        tvDinnerValue.setText(buildMealCopy("Bữa tối", summary.dinnerCalories));
+        if (tvNightValue != null) {
+            tvNightValue.setText(buildMealCopy("Bữa khuya", summary.nightCalories));
         }
-        tvWaterMl.setText(getString(R.string.journal_water_ml_format, currentWaterMl));
     }
 
-    private void updateCompletionStatus() {
-        int completed = 0;
-        if (cbBreakfast.isChecked()) {
-            completed++;
+    private String buildMealCopy(String label, double calories) {
+        if (calories <= 0) {
+            return label + " • Đang chờ dữ liệu";
         }
-        if (cbLunch.isChecked()) {
-            completed++;
+        return String.format(Locale.getDefault(), "%s • %.0f kcal hôm nay", label, calories);
+    }
+
+    private void openMealHistory() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).openMealHistory();
         }
-        if (cbDinner.isChecked()) {
-            completed++;
-        }
-        tvCompletion.setText(getString(R.string.journal_completion_format, completed, 3));
     }
 
     private void navigateToLogin() {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).openHomeLoginState();
         }
+    }
+
+    private void saveJournal() {
+        Toast.makeText(requireContext(), R.string.journal_saved_success, Toast.LENGTH_SHORT).show();
     }
 }

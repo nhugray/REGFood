@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 
 import com.finalterm.regfood.R;
+import com.finalterm.regfood.features.foodrecognition.view.ui.FoodRecognitionFragment;
 import com.finalterm.regfood.shared.session.UserSession;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
@@ -46,6 +48,7 @@ public class HomeFragment extends Fragment {
     private EditText etLoginEmail;
     private EditText etLoginPassword;
     private View btnGoogleSignIn;
+    private FrameLayout foodRecognitionContainer;
 
     @Nullable
     @Override
@@ -77,6 +80,7 @@ public class HomeFragment extends Fragment {
         etLoginEmail = view.findViewById(R.id.etLoginEmail);
         etLoginPassword = view.findViewById(R.id.etLoginPassword);
         btnGoogleSignIn = view.findViewById(R.id.btnGoogleSignIn);
+        foodRecognitionContainer = view.findViewById(R.id.foodRecognitionContainer);
 
         view.findViewById(R.id.btnScanMeal).setOnClickListener(v -> showScanState());
         view.findViewById(R.id.btnManualLog).setOnClickListener(v -> showHistoryState());
@@ -97,12 +101,12 @@ public class HomeFragment extends Fragment {
         view.findViewById(R.id.btnLoginSubmit).setOnClickListener(v -> handleLogin());
         view.findViewById(R.id.btnBackToAccount).setOnClickListener(v -> showAccountState());
         view.findViewById(R.id.btnBackFromHistory).setOnClickListener(v -> showHomeState());
-        view.findViewById(R.id.btnCapturePhoto).setOnClickListener(v -> showResultState());
-        view.findViewById(R.id.btnUploadPhoto).setOnClickListener(v -> showResultState());
+        view.findViewById(R.id.btnCapturePhoto).setOnClickListener(v -> openFoodRecognition());
+        view.findViewById(R.id.btnUploadPhoto).setOnClickListener(v -> openFoodRecognition());
         view.findViewById(R.id.btnBackHomeFromResultCard).setOnClickListener(v ->
             Toast.makeText(requireContext(), R.string.favorite_added_hint, Toast.LENGTH_SHORT).show()
         );
-        view.findViewById(R.id.btnScanAnother).setOnClickListener(v -> showScanState());
+        view.findViewById(R.id.btnScanAnother).setOnClickListener(v -> openFoodRecognition());
         btnGoogleSignIn.setOnClickListener(v -> handleGoogleSignIn());
 
         refreshUserUi();
@@ -115,6 +119,9 @@ public class HomeFragment extends Fragment {
 
     public void resetToMainHome() {
         if (homeStateRoot != null) {
+            if (foodRecognitionContainer != null) {
+                foodRecognitionContainer.setVisibility(View.GONE);
+            }
             showHomeState();
         }
     }
@@ -127,6 +134,9 @@ public class HomeFragment extends Fragment {
         loginStateRoot.setVisibility(View.GONE);
         scanStateRoot.setVisibility(View.GONE);
         resultStateRoot.setVisibility(View.GONE);
+        if (foodRecognitionContainer != null) {
+            foodRecognitionContainer.setVisibility(View.GONE);
+        }
     }
 
     private void showHistoryState() {
@@ -166,6 +176,22 @@ public class HomeFragment extends Fragment {
         loginStateRoot.setVisibility(View.GONE);
         scanStateRoot.setVisibility(View.VISIBLE);
         resultStateRoot.setVisibility(View.GONE);
+        foodRecognitionContainer.setVisibility(View.GONE);
+    }
+
+    private void openFoodRecognition() {
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.foodRecognitionContainer, new FoodRecognitionFragment())
+                .addToBackStack(null)
+                .commit();
+        
+        homeStateRoot.setVisibility(View.GONE);
+        historyStateRoot.setVisibility(View.GONE);
+        accountStateRoot.setVisibility(View.GONE);
+        loginStateRoot.setVisibility(View.GONE);
+        scanStateRoot.setVisibility(View.GONE);
+        resultStateRoot.setVisibility(View.GONE);
+        foodRecognitionContainer.setVisibility(View.VISIBLE);
     }
 
     private void showResultState() {
