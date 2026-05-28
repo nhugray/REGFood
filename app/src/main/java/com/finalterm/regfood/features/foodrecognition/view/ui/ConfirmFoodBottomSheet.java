@@ -17,8 +17,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
+import com.finalterm.regfood.MainActivity;
 import com.finalterm.regfood.R;
 import com.finalterm.regfood.features.foodrecognition.data.model.FoodPredictionResponse;
 import com.finalterm.regfood.local.entity.MealLogEntity;
@@ -245,20 +248,41 @@ public class ConfirmFoodBottomSheet extends BottomSheetDialogFragment {
                 now
         );
 
+        final FragmentActivity hostActivity = getActivity();
+        final Fragment parent = getParentFragment();
+        final android.content.Context appContext = requireContext().getApplicationContext();
+
         executorService.execute(() -> {
             try {
                 mealRepository.saveMeal(mealLog);
-                requireActivity().runOnUiThread(() -> {
-                    if (activity instanceof FoodConfirmationListener) {
-                        ((FoodConfirmationListener) activity).onFoodConfirmed(foodName, portionMultiplier, toppings, finalCalories, response);
-                    } else if (getParentFragment() instanceof FoodConfirmationListener) {
-                        ((FoodConfirmationListener) getParentFragment()).onFoodConfirmed(foodName, portionMultiplier, toppings, finalCalories, response);
+                if (hostActivity == null) {
+                    return;
+                }
+                hostActivity.runOnUiThread(() -> {
+                    if (!isAdded()) {
+                        return;
                     }
-                    Toast.makeText(requireContext(), "Đã lưu món và ảnh trong máy", Toast.LENGTH_SHORT).show();
-                    dismiss();
+                    if (hostActivity instanceof FoodConfirmationListener) {
+                        ((FoodConfirmationListener) hostActivity).onFoodConfirmed(foodName, portionMultiplier, toppings, finalCalories, response);
+                    } else if (parent instanceof FoodConfirmationListener) {
+                        ((FoodConfirmationListener) parent).onFoodConfirmed(foodName, portionMultiplier, toppings, finalCalories, response);
+                    }
+                    if (hostActivity instanceof MainActivity) {
+                        ((MainActivity) hostActivity).refreshHomeTodayMetrics();
+                    }
+                    // Toast.makeText(appContext, "Đã lưu món và ảnh trong máy", Toast.LENGTH_SHORT).show();
+                    if (getDialog() != null) {
+                        getDialog().dismiss();
+                    }
                 });
             } catch (Exception e) {
-                requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), "Lưu thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                if (hostActivity != null) {
+                    hostActivity.runOnUiThread(() -> {
+                        if (isAdded()) {
+                            Toast.makeText(appContext, "Lưu thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }
@@ -274,13 +298,17 @@ public class ConfirmFoodBottomSheet extends BottomSheetDialogFragment {
         }
 
         try {
-            File dir = new File(requireContext().getFilesDir(), "meal_images");
+            android.content.Context context = getContext();
+            if (context == null) {
+                return null;
+            }
+            File dir = new File(context.getFilesDir(), "meal_images");
             if (!dir.exists() && !dir.mkdirs()) {
                 return null;
             }
 
             File target = new File(dir, "meal_" + System.currentTimeMillis() + "_" + source.getName());
-            try (InputStream inputStream = requireContext().getContentResolver().openInputStream(android.net.Uri.fromFile(source));
+            try (InputStream inputStream = context.getContentResolver().openInputStream(android.net.Uri.fromFile(source));
                  FileOutputStream outputStream = new FileOutputStream(target)) {
                 if (inputStream == null) {
                     return null;

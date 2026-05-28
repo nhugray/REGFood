@@ -34,6 +34,10 @@ public class MealRepository {
         return food;
     }
 
+    public List<FoodItemEntity> getActiveFoods() {
+        return foodDao.getActiveFoods();
+    }
+
     public List<MealLogEntity> getMealsByUser(long userId) {
         return mealLogDao.getMealsByUser(userId);
     }

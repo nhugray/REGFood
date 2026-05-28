@@ -7,9 +7,9 @@
     <string name="nav_goals">Goals</string>
     <string name="nav_insights">Insights</string>
 
-    <string name="home_greeting">Hello, Guest</string>
-    <string name="home_greeting_format">Hello, %1$s</string>
-    <string name="user_display_guest">Guest</string>
+    <string name="home_greeting">Theo dõi bữa ăn thông minh bằng nhận diện AI</string>
+    <string name="home_greeting_format">%1$s</string>
+    <string name="user_display_guest">Khách</string>
     <string name="home_subtitle">Track smarter meals with AI-powered recognition.</string>
     <string name="guest_badge">Guest Mode</string>
     <string name="home_hero_title">Scan Your Meal</string>
@@ -87,10 +87,10 @@
     <string name="foods_section_supported">Supported Dishes</string>
     <string name="foods_item_1">Banh Mi</string>
     <string name="foods_item_1_short">Banh Mi</string>
-    <string name="foods_item_1_desc">Vietnamese bread sandwich with crisp bite.</string>
+    <string name="foods_item_1_desc">Món ăn phổ biến nhất Việt Nam</string>
     <string name="foods_item_1_detail_subtitle">Light, fast, and widely recognized.</string>
-    <string name="foods_item_1_detail_desc">Classic street food with pork, pate, herbs, pickles, and fresh vegetables.</string>
-    <string name="foods_item_1_detail_kcal">410 kcal</string>
+    <string name="foods_item_1_detail_desc">Món ăn phổ biến nhất Việt Nam.</string>
+    <string name="foods_item_1_detail_kcal">320 kcal</string>
     <string name="foods_item_1_detail_energy">Good for quick breakfast</string>
     <string name="foods_item_1_tag1">Street food</string>
     <string name="foods_item_1_tag2">Breakfast</string>
@@ -139,8 +139,8 @@
     <string name="journal_check_breakfast">Breakfast completed</string>
     <string name="journal_check_lunch">Lunch completed</string>
     <string name="journal_check_dinner">Dinner completed</string>
-    <string name="journal_completion_default">Completed 0/3 meals today</string>
-    <string name="journal_completion_format">Completed %1$d/%2$d meals today</string>
+    <string name="journal_completion_default">Đã có dữ liệu 0/4 buổi hôm nay</string>
+    <string name="journal_completion_format">Đã có dữ liệu %1$d/%2$d buổi hôm nay</string>
     <string name="journal_water_ml_default">1,500 ml</string>
     <string name="journal_water_ml_format">%1$d ml</string>
     <string name="journal_save_action">Save today log</string>

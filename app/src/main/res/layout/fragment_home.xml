@@ -26,29 +26,14 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvHomeGreeting"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvHomeGreeting"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/home_greeting"
-                        android:textColor="@color/neutral_900"
-                        android:textSize="26sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/home_subtitle"
-                        android:textColor="@color/neutral_500"
-                        android:textSize="14sp" />
-                </LinearLayout>
+                    android:text="Theo dõi bữa ăn thông minh bằng nhận diện AI"
+                    android:textColor="@color/neutral_500"
+                    android:textSize="14sp" />
 
                 <LinearLayout
                     android:id="@+id/btnProfileHome"
@@ -89,7 +74,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/home_hero_title"
+                        android:text="REGFood"
                         android:textColor="@color/white"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -129,7 +114,7 @@
                             android:layout_weight="1"
                             android:backgroundTint="@android:color/transparent"
                             android:strokeColor="@color/white"
-                            android:text="@string/action_log_manual"
+                            android:text="Ghi tay"
                             android:textAllCaps="false"
                             android:textColor="@color/white" />
                     </LinearLayout>
@@ -167,6 +152,7 @@
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/tvRemainingCalories"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
@@ -188,15 +174,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/stat_protein"
+                        android:text="Tiến độ hôm nay"
                         android:textColor="@color/neutral_500"
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/tvTodayProgressValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="@string/stat_protein_value"
+                        android:text="0%"
                         android:textColor="@color/neutral_900"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -218,23 +205,25 @@
                     android:textColor="@color/neutral_500"
                     android:textSize="12sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/stat_goal_progress_value"
-                    android:textColor="@color/neutral_900"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+<!--                <TextView-->
+<!--                    android:id="@+id/tvTodayProgressValue"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="6dp"-->
+<!--                    android:text="0%"-->
+<!--                    android:textColor="@color/neutral_900"-->
+<!--                    android:textSize="20sp"-->
+<!--                    android:textStyle="bold" />-->
 
                 <ProgressBar
+                    android:id="@+id/progressTodayGoal"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="10dp"
                     android:layout_marginTop="10dp"
                     android:indeterminate="false"
                     android:max="100"
-                    android:progress="68"
+                    android:progress="0"
                     android:progressTint="@color/green_500"
                     android:progressBackgroundTint="@color/green_100" />
             </LinearLayout>

@@ -96,16 +96,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openMealHistory() {
+        navigateToJournalScreen(new MealHistoryFragment(), TAG_HISTORY);
+    }
+
+    public void openJournalTab() {
+        navigateToJournalScreen(new JournalFragment(), TAG_JOURNAL);
+    }
+
+    private void navigateToJournalScreen(androidx.fragment.app.Fragment fragment, String tag) {
+        clearNestedNavigationState();
+        getSupportFragmentManager().popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
         currentTab = BottomTab.JOURNAL;
         updateBottomNavigationState(BottomTab.JOURNAL);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.contentHost, new MealHistoryFragment(), TAG_HISTORY)
-                .commit();
+                .replace(R.id.contentHost, fragment, tag)
+                .commitNowAllowingStateLoss();
+    }
+
+    private void clearNestedNavigationState() {
+        for (androidx.fragment.app.Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment != null) {
+                fragment.getChildFragmentManager().popBackStackImmediate(
+                        null,
+                        androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+                );
+            }
+        }
+    }
+
+    public void openFoodCatalogEntry() {
+        getSupportFragmentManager().popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.contentHost, new com.finalterm.regfood.features.foodrecognition.view.ui.ManualMealEntryFragment(), "tag_manual_meal_entry")
+                .commitNowAllowingStateLoss();
     }
 
     public void openHomeLoginState() {
         UserSession.requestLoginPrompt();
         selectTab(BottomTab.HOME, true);
+    }
+
+    public void refreshHomeTodayMetrics() {
+        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag(TAG_HOME);
+        if (homeFragment != null) {
+            homeFragment.refreshTodayMetrics();
+        }
     }
 
     private void resetCurrentTabView(BottomTab selectedTab) {

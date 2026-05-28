@@ -3,6 +3,9 @@ package com.finalterm.regfood.local;
 import android.content.Context;
 
 import androidx.room.Room;
+import androidx.room.RoomDatabase;
+
+import com.finalterm.regfood.local.repository.FoodCatalogSeeder;
 
 public final class RoomDatabaseProvider {
 
@@ -19,7 +22,16 @@ public final class RoomDatabaseProvider {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "regfood_local_db"
-                    ).build();
+                    )
+                    .fallbackToDestructiveMigration()
+                    .addCallback(new RoomDatabase.Callback() {
+                        @Override
+                        public void onCreate(@androidx.annotation.NonNull androidx.sqlite.db.SupportSQLiteDatabase db) {
+                            super.onCreate(db);
+                            new FoodCatalogSeeder(context.getApplicationContext()).seedIfNeeded(null);
+                        }
+                    })
+                    .build();
                 }
             }
         }

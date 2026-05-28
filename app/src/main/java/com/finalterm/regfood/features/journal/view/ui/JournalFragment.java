@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,10 +16,14 @@ import com.finalterm.regfood.MainActivity;
 import com.finalterm.regfood.R;
 import com.finalterm.regfood.features.journal.data.JournalRepository;
 import com.finalterm.regfood.features.journal.domain.JournalSummary;
+import com.finalterm.regfood.local.entity.FavoriteFoodEntity;
+import com.finalterm.regfood.local.repository.FavoriteFoodRepository;
 import com.finalterm.regfood.shared.session.UserSession;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,10 +37,13 @@ public class JournalFragment extends Fragment {
     private TextView tvLunchValue;
     private TextView tvDinnerValue;
     private TextView tvNightValue;
+    private TextView tvFavoritesCount;
+    private LinearLayout favoritesContainer;
     private MaterialButton btnOpenHistory;
     private LinearProgressIndicator progressMeal;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private JournalRepository journalRepository;
+    private FavoriteFoodRepository favoriteFoodRepository;
 
     @Nullable
     @Override
@@ -50,6 +57,7 @@ public class JournalFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         journalRepository = new JournalRepository(requireContext().getApplicationContext());
+        favoriteFoodRepository = new FavoriteFoodRepository(requireContext().getApplicationContext());
         guestGateBar = view.findViewById(R.id.journalGuestGateBar);
         guestPreviewRoot = view.findViewById(R.id.journalGuestPreviewRoot);
         memberInteractiveRoot = view.findViewById(R.id.journalMemberInteractiveRoot);
@@ -57,6 +65,8 @@ public class JournalFragment extends Fragment {
         tvLunchValue = view.findViewById(R.id.tvLunchValue);
         tvDinnerValue = view.findViewById(R.id.tvDinnerValue);
         tvNightValue = view.findViewById(R.id.tvNightValue);
+        tvFavoritesCount = view.findViewById(R.id.tvFavoritesCount);
+        favoritesContainer = view.findViewById(R.id.favoritesContainer);
         btnOpenHistory = view.findViewById(R.id.btnOpenMealHistory);
         progressMeal = view.findViewById(R.id.progressMeal);
 
@@ -65,6 +75,7 @@ public class JournalFragment extends Fragment {
 
         renderAccessState();
         loadTodaySummary();
+        loadFavorites();
     }
 
     private void renderAccessState() {
@@ -85,7 +96,8 @@ public class JournalFragment extends Fragment {
     }
 
     private void applySummary(JournalSummary summary) {
-        progressMeal.setProgress((int) Math.round(summary.mealCompletionRatio * 100));
+        progressMeal.setMax(summary.targetMeals);
+        progressMeal.setProgress(summary.completedMeals);
 
         tvBreakfastValue.setText(buildMealCopy("Bữa sáng", summary.breakfastCalories));
         tvLunchValue.setText(buildMealCopy("Bữa trưa", summary.lunchCalories));
@@ -93,6 +105,77 @@ public class JournalFragment extends Fragment {
         if (tvNightValue != null) {
             tvNightValue.setText(buildMealCopy("Bữa khuya", summary.nightCalories));
         }
+
+        TextView completion = requireView().findViewById(R.id.tvJournalCompletion);
+        if (completion != null) {
+            completion.setText(String.format(Locale.getDefault(), "%d/%d buổi đã có dữ liệu", summary.completedMeals, summary.targetMeals));
+        }
+    }
+
+    private void loadFavorites() {
+        executor.execute(() -> {
+            long userId = UserSession.isGuest() ? 0L : Math.abs(UserSession.getCurrentEmail().hashCode());
+            List<FavoriteFoodEntity> favorites = favoriteFoodRepository.getFavoritesByUser(userId);
+            if (!isAdded()) {
+                return;
+            }
+            requireActivity().runOnUiThread(() -> renderFavorites(favorites));
+        });
+    }
+
+    private void renderFavorites(List<FavoriteFoodEntity> favorites) {
+        favoritesContainer.removeAllViews();
+        if (favorites == null || favorites.isEmpty()) {
+            tvFavoritesCount.setText("0 món yêu thích");
+            return;
+        }
+
+        tvFavoritesCount.setText(String.format(Locale.getDefault(), "%d món yêu thích", favorites.size()));
+        for (FavoriteFoodEntity favorite : favorites) {
+            favoritesContainer.addView(createFavoriteCard(favorite));
+        }
+    }
+
+    private View createFavoriteCard(FavoriteFoodEntity favorite) {
+        MaterialCardView card = new MaterialCardView(requireContext());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.topMargin = 12;
+        card.setLayoutParams(params);
+        card.setCardBackgroundColor(getResources().getColor(R.color.white, null));
+        card.setStrokeColor(getResources().getColor(R.color.neutral_100, null));
+        card.setStrokeWidth(1);
+        card.setRadius(24f);
+
+        LinearLayout content = new LinearLayout(requireContext());
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(16, 16, 16, 16);
+
+        TextView title = new TextView(requireContext());
+        title.setText(favorite.foodNameSnapshot);
+        title.setTextColor(getResources().getColor(R.color.neutral_900, null));
+        title.setTextSize(16f);
+        title.setTypeface(title.getTypeface(), android.graphics.Typeface.BOLD);
+
+        TextView subtitle = new TextView(requireContext());
+        subtitle.setText(favorite.subtitleSnapshot);
+        subtitle.setTextColor(getResources().getColor(R.color.neutral_500, null));
+        subtitle.setTextSize(13f);
+        subtitle.setPadding(0, 6, 0, 0);
+
+        TextView kcal = new TextView(requireContext());
+        kcal.setText(String.format(Locale.getDefault(), "%.0f kcal", favorite.caloriesSnapshot));
+        kcal.setTextColor(getResources().getColor(R.color.green_700, null));
+        kcal.setTextSize(14f);
+        kcal.setPadding(0, 10, 0, 0);
+
+        content.addView(title);
+        content.addView(subtitle);
+        content.addView(kcal);
+        card.addView(content);
+        return card;
     }
 
     private String buildMealCopy(String label, double calories) {
@@ -112,9 +195,5 @@ public class JournalFragment extends Fragment {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).openHomeLoginState();
         }
-    }
-
-    private void saveJournal() {
-        Toast.makeText(requireContext(), R.string.journal_saved_success, Toast.LENGTH_SHORT).show();
     }
 }

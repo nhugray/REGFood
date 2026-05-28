@@ -2,7 +2,6 @@ package com.finalterm.regfood.features.foodrecognition.view.ui;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,6 +19,7 @@ import com.finalterm.regfood.R;
 import com.finalterm.regfood.local.entity.MealLogEntity;
 import com.finalterm.regfood.local.repository.MealRepository;
 import com.finalterm.regfood.shared.session.UserSession;
+import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -53,24 +53,30 @@ public class MealHistoryFragment extends Fragment {
         tvSummary = view.findViewById(R.id.tvHistorySummary);
         mealRepository = new MealRepository(requireContext().getApplicationContext());
 
+        view.findViewById(R.id.btnAddMealInDay).setOnClickListener(v -> openManualMealEntry());
         loadHistory();
+    }
+
+    private void openManualMealEntry() {
+        if (getActivity() instanceof com.finalterm.regfood.MainActivity) {
+            ((com.finalterm.regfood.MainActivity) getActivity()).openFoodCatalogEntry();
+        }
     }
 
     private void loadHistory() {
         final long userId = UserSession.isGuest() ? 0L : Math.abs(UserSession.getCurrentEmail().hashCode());
         executor.execute(() -> {
             List<MealLogEntity> meals = mealRepository.getMealsByUser(userId);
+            if (!isAdded()) return;
             requireActivity().runOnUiThread(() -> renderHistory(meals));
         });
     }
 
     private void renderHistory(List<MealLogEntity> meals) {
         historyContainer.removeAllViews();
-        if (meals == null) {
-            meals = new ArrayList<>();
-        }
+        if (meals == null) meals = new ArrayList<>();
 
-        tvSummary.setText(String.format(Locale.US, "%d món đã lưu", meals.size()));
+        tvSummary.setText(String.format(Locale.getDefault(), "%d món đã lưu", meals.size()));
         emptyState.setVisibility(meals.isEmpty() ? View.VISIBLE : View.GONE);
         historyContainer.setVisibility(meals.isEmpty() ? View.GONE : View.VISIBLE);
 
@@ -92,7 +98,7 @@ public class MealHistoryFragment extends Fragment {
 
         title.setText(!TextUtils.isEmpty(meal.foodNameSnapshot) ? meal.foodNameSnapshot : "Món ăn");
         subtitle.setText(buildMetaText(meal));
-        calories.setText(String.format(Locale.US, "%.0f kcal", meal.totalCalories));
+        calories.setText(String.format(Locale.getDefault(), "%.0f kcal", meal.totalCalories));
         date.setText(formatDate(meal.eatenAt));
 
         bindImage(image, fallback, meal.imageLocalPath);
