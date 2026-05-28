@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.finalterm.regfood.MainActivity;
 import com.finalterm.regfood.R;
+import com.finalterm.regfood.features.goals.domain.TargetNutritionCalculator;
 import com.finalterm.regfood.local.entity.UserProfileEntity;
 import com.finalterm.regfood.local.repository.UserProfileRepository;
 import com.finalterm.regfood.shared.session.UserSession;
@@ -123,17 +124,18 @@ public class GoalsFragment extends Fragment {
     }
 
     private void updatePreview() {
-        double calories = calculateCalories();
-        double protein = Math.max(0, calories * 0.25 / 4.0);
-        double carbs = Math.max(0, calories * 0.45 / 4.0);
-        double fat = Math.max(0, calories * 0.30 / 9.0);
-        tvGoalCalories.setText(calories > 0 ? String.format("Calo/ngày: %.0f kcal", calories) : "Calo/ngày: --");
-        tvMacroPreview.setText(calories > 0
-                ? String.format("Protein %.0fg • Carb %.0fg • Fat %.0fg", protein, carbs, fat)
+        TargetNutritionCalculator.TargetNutrition target = calculateTargets();
+        tvGoalCalories.setText(target.calories > 0 ? String.format("Calo/ngày: %.0f kcal", target.calories) : "Calo/ngày: --");
+        tvMacroPreview.setText(target.calories > 0
+                ? String.format("Protein %.0fg • Carb %.0fg • Fat %.0fg", target.protein, target.carbs, target.fat)
                 : "Protein --g • Carb --g • Fat --g");
     }
 
     private double calculateCalories() {
+        return calculateTargets().calories;
+    }
+
+    private TargetNutritionCalculator.TargetNutrition calculateTargets() {
         int age = parseInt(textOf(etAge), 0);
         double height = parseDouble(textOf(etHeight), 0);
         double weight = parseDouble(textOf(etWeight), 0);
@@ -141,26 +143,7 @@ public class GoalsFragment extends Fragment {
         String activity = textOf(spActivityLevel);
         String goalType = getGoalType();
 
-        if (age <= 0 || height <= 0 || weight <= 0) {
-            return 0;
-        }
-
-        double bmr = "Nữ".equalsIgnoreCase(gender)
-                ? 10 * weight + 6.25 * height - 5 * age - 161
-                : 10 * weight + 6.25 * height - 5 * age + 5;
-
-        double tdee = bmr * getActivityMultiplier(activity);
-        if ("Giảm cân".equals(goalType)) return Math.max(0, tdee - 350);
-        if ("Tăng cân".equals(goalType)) return tdee + 300;
-        return tdee;
-    }
-
-    private double getActivityMultiplier(String activity) {
-        if ("Vận động nhẹ".equals(activity)) return 1.375;
-        if ("Vận động vừa".equals(activity)) return 1.55;
-        if ("Vận động nhiều".equals(activity)) return 1.725;
-        if ("Rất năng động".equals(activity)) return 1.9;
-        return 1.2;
+        return TargetNutritionCalculator.calculate(age, height, weight, gender, activity, goalType);
     }
 
     private String getGoalType() {
@@ -197,15 +180,12 @@ public class GoalsFragment extends Fragment {
             return;
         }
 
-        double calories = calculateCalories();
-        if (calories <= 0) {
+        TargetNutritionCalculator.TargetNutrition target = calculateTargets();
+        if (target.calories <= 0) {
             Toast.makeText(requireContext(), "Không thể tính calo từ dữ liệu hiện tại", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        double protein = calories * 0.25 / 4.0;
-        double carbs = calories * 0.45 / 4.0;
-        double fat = calories * 0.30 / 9.0;
         long now = System.currentTimeMillis();
 
         UserProfileEntity profile = new UserProfileEntity(
@@ -219,10 +199,10 @@ public class GoalsFragment extends Fragment {
                 weight,
                 activity,
                 goalType,
-                calories,
-                protein,
-                carbs,
-                fat,
+                target.calories,
+                target.protein,
+                target.carbs,
+                target.fat,
                 now,
                 now
         );
