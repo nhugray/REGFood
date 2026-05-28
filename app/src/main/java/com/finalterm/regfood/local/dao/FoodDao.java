@@ -36,6 +36,9 @@ public interface FoodDao {
     @Query("SELECT fi.* FROM food_items fi INNER JOIN food_aliases fa ON fi.id = fa.foodId WHERE fa.aliasName = :aliasName LIMIT 1")
     FoodItemEntity findByAlias(String aliasName);
 
+    @Query("SELECT * FROM food_items WHERE isActive = 1 ORDER BY foodName COLLATE NOCASE")
+    List<FoodItemEntity> getActiveFoods();
+
     @Query("SELECT * FROM portion_rules WHERE foodId = :foodId")
     List<PortionRuleEntity> getPortionRules(long foodId);
 

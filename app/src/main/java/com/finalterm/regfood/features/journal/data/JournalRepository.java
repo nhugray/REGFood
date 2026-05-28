@@ -8,9 +8,9 @@ import com.finalterm.regfood.local.repository.MealRepository;
 import com.finalterm.regfood.shared.session.UserSession;
 
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class JournalRepository {
 
@@ -24,7 +24,6 @@ public class JournalRepository {
         long userId = UserSession.isGuest() ? 0L : Math.abs(UserSession.getCurrentEmail().hashCode());
         List<MealLogEntity> meals = mealRepository.getMealsByUser(userId);
         long startOfDay = startOfToday();
-        int mealCount = 0;
         double breakfastCalories = 0d;
         double lunchCalories = 0d;
         double dinnerCalories = 0d;
@@ -33,19 +32,24 @@ public class JournalRepository {
         double carbs = 0d;
         double fat = 0d;
         int waterMl = 1500;
+        Set<String> completedMealTypes = new HashSet<>();
 
         for (MealLogEntity meal : meals) {
             if (meal.eatenAt >= startOfDay) {
-                mealCount++;
                 double calories = meal.totalCalories;
-                if ("breakfast".equalsIgnoreCase(meal.mealType)) {
+                String normalizedMealType = normalizeMealType(meal.mealType);
+                if ("breakfast".equals(normalizedMealType)) {
                     breakfastCalories += calories;
-                } else if ("lunch".equalsIgnoreCase(meal.mealType)) {
+                    completedMealTypes.add("breakfast");
+                } else if ("lunch".equals(normalizedMealType)) {
                     lunchCalories += calories;
-                } else if ("dinner".equalsIgnoreCase(meal.mealType)) {
+                    completedMealTypes.add("lunch");
+                } else if ("dinner".equals(normalizedMealType)) {
                     dinnerCalories += calories;
-                } else if ("night".equalsIgnoreCase(meal.mealType)) {
+                    completedMealTypes.add("dinner");
+                } else if ("night".equals(normalizedMealType)) {
                     nightCalories += calories;
+                    completedMealTypes.add("night");
                 }
                 protein += meal.totalProtein;
                 carbs += meal.totalCarbs;
@@ -55,23 +59,34 @@ public class JournalRepository {
 
         double totalCalories = breakfastCalories + lunchCalories + dinnerCalories + nightCalories;
         int targetMeals = 4;
-        int completedMeals = Math.min(countMealTypes(breakfastCalories, lunchCalories, dinnerCalories, nightCalories), targetMeals);
+        int completedMeals = Math.min(completedMealTypes.size(), targetMeals);
         double ratio = targetMeals == 0 ? 0d : (double) completedMeals / targetMeals;
         String energyState = buildEnergyState(totalCalories);
         String nextMealHint = buildNextMealHint(completedMeals, totalCalories);
 
-        return new JournalSummary(mealCount, completedMeals, breakfastCalories, lunchCalories,
+        return new JournalSummary(completedMealTypes.size(), completedMeals, breakfastCalories, lunchCalories,
                 dinnerCalories, nightCalories, totalCalories, protein, carbs, fat,
                 waterMl, targetMeals, ratio, energyState, nextMealHint);
     }
 
-    private int countMealTypes(double breakfastCalories, double lunchCalories, double dinnerCalories, double nightCalories) {
-        int count = 0;
-        if (breakfastCalories > 0) count++;
-        if (lunchCalories > 0) count++;
-        if (dinnerCalories > 0) count++;
-        if (nightCalories > 0) count++;
-        return count;
+    private String normalizeMealType(String mealType) {
+        if (mealType == null) {
+            return "";
+        }
+        String value = mealType.trim().toLowerCase();
+        if (value.contains("sáng") || value.contains("breakfast") || value.contains("morning")) {
+            return "breakfast";
+        }
+        if (value.contains("trưa") || value.contains("lunch")) {
+            return "lunch";
+        }
+        if (value.contains("tối") || value.contains("dinner")) {
+            return "dinner";
+        }
+        if (value.contains("khuya") || value.contains("đêm") || value.contains("night")) {
+            return "night";
+        }
+        return value;
     }
 
     private String buildEnergyState(double calories) {

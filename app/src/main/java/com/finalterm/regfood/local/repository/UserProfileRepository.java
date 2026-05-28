@@ -52,43 +52,17 @@ public class UserProfileRepository {
     public void getProfileByUid(String firebaseUid, ProfileCallback callback) {
         executorService.execute(() -> {
             UserProfileEntity profile = database.userProfileDao().findByFirebaseUid(firebaseUid);
-            if (profile != null) {
-                if (callback != null) callback.onLoaded(profile);
-                return;
-            }
-
-            firestore.collection(COLLECTION_USERS)
-                    .document(firebaseUid)
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (!documentSnapshot.exists()) {
-                            if (callback != null) callback.onLoaded(null);
-                            return;
-                        }
-
-                        UserProfileEntity cloudProfile = documentSnapshot.toObject(UserProfileEntity.class);
-                        if (cloudProfile == null) {
-                            if (callback != null) callback.onLoaded(null);
-                            return;
-                        }
-
-                        if (cloudProfile.firebaseUid == null || cloudProfile.firebaseUid.isEmpty()) {
-                            cloudProfile.firebaseUid = firebaseUid;
-                        }
-
-                        executorService.execute(() -> {
-                            try {
-                                database.userProfileDao().insert(cloudProfile);
-                            } catch (Exception ignored) {
-                                // Ignore local cache write errors and still return cloud data.
-                            }
-                            if (callback != null) callback.onLoaded(cloudProfile);
-                        });
-                    })
-                    .addOnFailureListener(e -> {
-                        if (callback != null) callback.onLoaded(null);
-                    });
+            if (callback != null) callback.onLoaded(profile);
         });
+    }
+
+    public UserProfileEntity getProfileByUidSync(String firebaseUid) {
+        return database.userProfileDao().findByFirebaseUid(firebaseUid);
+    }
+
+    public double getTargetCaloriesSync(String firebaseUid) {
+        UserProfileEntity profile = database.userProfileDao().findByFirebaseUid(firebaseUid);
+        return profile != null ? profile.targetCalories : 0d;
     }
 
     private void saveProfileToCloud(UserProfileEntity profile, ResultCallback callback) {

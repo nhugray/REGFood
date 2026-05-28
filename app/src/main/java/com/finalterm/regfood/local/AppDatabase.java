@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase;
 
 import com.finalterm.regfood.local.dao.AiPredictionDao;
 import com.finalterm.regfood.local.dao.DailySummaryDao;
+import com.finalterm.regfood.local.dao.FavoriteFoodDao;
 import com.finalterm.regfood.local.dao.FoodDao;
 import com.finalterm.regfood.local.dao.MealLogDao;
 import com.finalterm.regfood.local.dao.UserProfileDao;
@@ -12,6 +13,7 @@ import com.finalterm.regfood.local.dao.UserSettingsDao;
 import com.finalterm.regfood.local.entity.AddonItemEntity;
 import com.finalterm.regfood.local.entity.AiPredictionEntity;
 import com.finalterm.regfood.local.entity.DailySummaryEntity;
+import com.finalterm.regfood.local.entity.FavoriteFoodEntity;
 import com.finalterm.regfood.local.entity.FoodAliasEntity;
 import com.finalterm.regfood.local.entity.FoodItemEntity;
 import com.finalterm.regfood.local.entity.MealLogEntity;
@@ -31,9 +33,10 @@ import com.finalterm.regfood.local.entity.UserSettingsEntity;
                 MealLogEntity.class,
                 AiPredictionEntity.class,
                 DailySummaryEntity.class,
-                UserSettingsEntity.class
+                UserSettingsEntity.class,
+                FavoriteFoodEntity.class
         },
-        version = 2,
+        version = 3,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -41,6 +44,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UserProfileDao userProfileDao();
     public abstract FoodDao foodDao();
     public abstract MealLogDao mealLogDao();
+    public abstract FavoriteFoodDao favoriteFoodDao();
     public abstract AiPredictionDao aiPredictionDao();
     public abstract DailySummaryDao dailySummaryDao();
     public abstract UserSettingsDao userSettingsDao();

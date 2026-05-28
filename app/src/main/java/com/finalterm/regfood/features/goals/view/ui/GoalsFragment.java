@@ -231,7 +231,12 @@ public class GoalsFragment extends Fragment {
             @Override
             public void onSuccess() {
                 if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), "Đã lưu hồ sơ sức khỏe", Toast.LENGTH_SHORT).show());
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(requireContext(), "Đã lưu hồ sơ sức khỏe", Toast.LENGTH_SHORT).show();
+                    if (requireActivity() instanceof MainActivity) {
+                        ((MainActivity) requireActivity()).refreshHomeTodayMetrics();
+                    }
+                });
             }
 
             @Override

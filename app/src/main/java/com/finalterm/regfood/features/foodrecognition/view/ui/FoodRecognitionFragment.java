@@ -46,7 +46,7 @@ import java.util.Locale;
 public class FoodRecognitionFragment extends Fragment implements ConfirmFoodBottomSheet.FoodConfirmationListener {
     private static final String TAG = "FoodRecognition";
     private static final int PERMISSION_REQUEST_CODE = 100;
-    private static final String IMAGE_DIR = "food_images";
+    private static final String IMAGE_DIR = "images";
 
     private LinearLayout cameraStateRoot;
     private LinearLayout loadingStateRoot;
@@ -512,7 +512,9 @@ public class FoodRecognitionFragment extends Fragment implements ConfirmFoodBott
         cleanupPendingImageFile();
         currentPredictionResponse = null;
         Toast.makeText(requireContext(), "Đã xác nhận: " + foodName, Toast.LENGTH_SHORT).show();
-        showCameraState();
+        if (requireActivity() instanceof com.finalterm.regfood.MainActivity) {
+            ((com.finalterm.regfood.MainActivity) requireActivity()).openJournalTab();
+        }
     }
 
     @Override

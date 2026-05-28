@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.credentials.Credential;
 import androidx.credentials.CredentialManager;
 import androidx.credentials.CustomCredential;
@@ -21,6 +23,10 @@ import androidx.credentials.exceptions.GetCredentialException;
 
 import com.finalterm.regfood.R;
 import com.finalterm.regfood.features.foodrecognition.view.ui.FoodRecognitionFragment;
+import com.finalterm.regfood.features.journal.data.JournalRepository;
+import com.finalterm.regfood.features.journal.domain.JournalSummary;
+import com.finalterm.regfood.local.entity.UserProfileEntity;
+import com.finalterm.regfood.local.repository.UserProfileRepository;
 import com.finalterm.regfood.shared.session.UserSession;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
@@ -37,9 +43,6 @@ public class HomeFragment extends Fragment {
     private View resultStateRoot;
     private TextView tvHomeGreeting;
     private TextView tvProfileHomeInitial;
-    private TextView tvProfileHistoryInitial;
-    private TextView tvProfileScanInitial;
-    private TextView tvProfileResultInitial;
     private TextView tvAccountDisplayName;
     private TextView btnLoginFromAccount;
     private View historyGuestLoginBar;
@@ -49,6 +52,12 @@ public class HomeFragment extends Fragment {
     private EditText etLoginPassword;
     private View btnGoogleSignIn;
     private FrameLayout foodRecognitionContainer;
+    private TextView tvRemainingCalories;
+    private TextView tvTodayProgressValue;
+    private ProgressBar progressTodayGoal;
+    private UserProfileRepository userProfileRepository;
+    private JournalRepository journalRepository;
+    private final java.util.concurrent.ExecutorService homeExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
 
     @Nullable
     @Override
@@ -69,9 +78,6 @@ public class HomeFragment extends Fragment {
         resultStateRoot = view.findViewById(R.id.resultStateRoot);
         tvHomeGreeting = view.findViewById(R.id.tvHomeGreeting);
         tvProfileHomeInitial = view.findViewById(R.id.tvProfileHomeInitial);
-        tvProfileHistoryInitial = view.findViewById(R.id.tvProfileHistoryInitial);
-        tvProfileScanInitial = view.findViewById(R.id.tvProfileScanInitial);
-        tvProfileResultInitial = view.findViewById(R.id.tvProfileResultInitial);
         tvAccountDisplayName = view.findViewById(R.id.tvAccountDisplayName);
         btnLoginFromAccount = view.findViewById(R.id.btnLoginFromAccount);
         historyGuestLoginBar = view.findViewById(R.id.historyGuestLoginBar);
@@ -81,13 +87,15 @@ public class HomeFragment extends Fragment {
         etLoginPassword = view.findViewById(R.id.etLoginPassword);
         btnGoogleSignIn = view.findViewById(R.id.btnGoogleSignIn);
         foodRecognitionContainer = view.findViewById(R.id.foodRecognitionContainer);
+        tvRemainingCalories = view.findViewById(R.id.tvRemainingCalories);
+        tvTodayProgressValue = view.findViewById(R.id.tvTodayProgressValue);
+        progressTodayGoal = view.findViewById(R.id.progressTodayGoal);
+        userProfileRepository = new UserProfileRepository(requireContext().getApplicationContext());
+        journalRepository = new JournalRepository(requireContext().getApplicationContext());
 
         view.findViewById(R.id.btnScanMeal).setOnClickListener(v -> showScanState());
-        view.findViewById(R.id.btnManualLog).setOnClickListener(v -> showHistoryState());
-        view.findViewById(R.id.btnProfileHome).setOnClickListener(v -> showAccountState());
-        view.findViewById(R.id.btnProfileHistory).setOnClickListener(v -> showAccountState());
-        view.findViewById(R.id.btnProfileScan).setOnClickListener(v -> showAccountState());
-        view.findViewById(R.id.btnProfileResult).setOnClickListener(v -> showAccountState());
+        view.findViewById(R.id.btnManualLog).setOnClickListener(v -> openMealHistoryPage());
+        view.findViewById(R.id.btnProfileHome).setOnClickListener(v -> handleProfileTap());
         view.findViewById(R.id.btnLoginFromHistory).setOnClickListener(v -> showLoginState());
         btnLoginFromAccount.setOnClickListener(v -> {
             if (UserSession.isGuest()) {
@@ -149,6 +157,22 @@ public class HomeFragment extends Fragment {
         resultStateRoot.setVisibility(View.GONE);
     }
 
+    private void showMealHistoryState() {
+        refreshUserUi();
+        homeStateRoot.setVisibility(View.GONE);
+        historyStateRoot.setVisibility(View.VISIBLE);
+        accountStateRoot.setVisibility(View.GONE);
+        loginStateRoot.setVisibility(View.GONE);
+        scanStateRoot.setVisibility(View.GONE);
+        resultStateRoot.setVisibility(View.GONE);
+    }
+
+    private void openMealHistoryPage() {
+        if (requireActivity() instanceof com.finalterm.regfood.MainActivity) {
+            ((com.finalterm.regfood.MainActivity) requireActivity()).openMealHistory();
+        }
+    }
+
     private void showAccountState() {
         refreshUserUi();
         homeStateRoot.setVisibility(View.GONE);
@@ -202,6 +226,16 @@ public class HomeFragment extends Fragment {
         loginStateRoot.setVisibility(View.GONE);
         scanStateRoot.setVisibility(View.GONE);
         resultStateRoot.setVisibility(View.VISIBLE);
+    }
+
+    private void handleProfileTap() {
+        if (UserSession.isGuest()) {
+            showLoginState();
+            return;
+        }
+        UserSession.logout();
+        Toast.makeText(requireContext(), R.string.auth_logout_success, Toast.LENGTH_SHORT).show();
+        showHomeState();
     }
 
     private void handleLogin() {
@@ -293,15 +327,12 @@ public class HomeFragment extends Fragment {
         }
 
         String displayName = UserSession.isGuest()
-            ? getString(R.string.user_display_guest)
-            : UserSession.getCurrentEmail();
+                ? getString(R.string.user_display_guest)
+                : UserSession.getCurrentEmail();
         String profileInitial = UserSession.isGuest() ? "G" : getEmailInitial(UserSession.getCurrentEmail());
 
-        tvHomeGreeting.setText(getString(R.string.home_greeting_format, displayName));
+        tvHomeGreeting.setText("Theo dõi bữa ăn thông minh bằng nhận diện AI");
         tvProfileHomeInitial.setText(profileInitial);
-        tvProfileHistoryInitial.setText(profileInitial);
-        tvProfileScanInitial.setText(profileInitial);
-        tvProfileResultInitial.setText(profileInitial);
         tvAccountDisplayName.setText(displayName);
         btnLoginFromAccount.setText(UserSession.isGuest() ? R.string.action_login : R.string.action_logout);
 
@@ -309,6 +340,40 @@ public class HomeFragment extends Fragment {
         historyGuestLoginBar.setVisibility(isGuest ? View.VISIBLE : View.GONE);
         historyGuestPreviewRoot.setVisibility(isGuest ? View.VISIBLE : View.GONE);
         historyMemberRoot.setVisibility(isGuest ? View.GONE : View.VISIBLE);
+
+        refreshTodayMetrics();
+    }
+
+    public void refreshTodayMetrics() {
+        homeExecutor.execute(() -> {
+            double targetCalories = 0d;
+            if (!UserSession.isGuest() && UserSession.getCurrentUser() != null) {
+                targetCalories = userProfileRepository.getTargetCaloriesSync(UserSession.getCurrentUser().getUid());
+            }
+            JournalSummary summary = journalRepository.loadTodaySummary();
+
+            double consumedCalories = summary != null ? summary.totalCalories : 0d;
+            final double resolvedTargetCalories = targetCalories;
+            final double resolvedConsumedCalories = consumedCalories;
+            final double resolvedRemainingCalories = Math.max(0d, resolvedTargetCalories - resolvedConsumedCalories);
+            final int resolvedProgressPercent = resolvedTargetCalories > 0d
+                    ? (int) Math.min(100d, Math.round((resolvedConsumedCalories / resolvedTargetCalories) * 100d))
+                    : 0;
+
+            if (!isAdded()) {
+                return;
+            }
+
+            requireActivity().runOnUiThread(() -> {
+                tvRemainingCalories.setText(resolvedTargetCalories > 0d
+                        ? String.format(java.util.Locale.getDefault(), "%.0f kcal", resolvedRemainingCalories)
+                        : "-- kcal");
+                tvTodayProgressValue.setText(resolvedTargetCalories > 0d
+                        ? String.format(java.util.Locale.getDefault(), "%d%%", resolvedProgressPercent)
+                        : "--");
+                progressTodayGoal.setProgress(Math.max(0, resolvedProgressPercent));
+            });
+        });
     }
 
     private String getEmailInitial(String email) {
